@@ -2,7 +2,7 @@ From: https://github.com/appdotnet/template-terms-of-service/blob/master/terms_t
 
 # **BITCORD** TERMS OF SERVICE
 
-Last Updated: **[DATE]**
+Last Updated: **2/8/2025**
 
 These terms of service ("Terms") apply to your access and use of **[APP NAME/WEBSITE/OTHER SERVICES]** (the "Service"). Please read them carefully.
 
