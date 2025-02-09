@@ -11,7 +11,8 @@ bot = commands.Bot(command_prefix="!", intents=intents)
 @bot.event
 async def on_ready():
     await bot.tree.sync()
-    print(f'Logged in as {bot.user}')
+    await bot.change_presence(status=discord.Status.idle)
+    print(f'Bot started: {bot.user}')
 
 @bot.tree.command(name="search-btc")
 async def searchBtc(ctx: discord.Interaction, address: str):
@@ -40,7 +41,7 @@ async def searchBtc(ctx: discord.Interaction, address: str):
 async def searchEth(ctx: discord.Interaction, address: str):
     await ctx.response.defer()
 
-    r = get(f"https://api.etherscan.io/api?module=account&action=balance&address={address}&tag=latest&apikey=EMPDNNDMX6GU6J9TCSGQQK74UK52VMDQ6Q")
+    r = get(f"https://api.etherscan.io/api?module=account&action=balance&address={address}&tag=latest&apikey=REDACTED")
     data = r.json()
 
     if data['message'] == "OK":
@@ -80,6 +81,56 @@ async def searchLtc(ctx: discord.Interaction, address: str):
         )
         embed.add_field(name="Balance", value=f"**{int(data['balance']) / 100000000}** LTC\n")
         embed.add_field(name="Transactions", value=f"Total Received: **{int(data['total_received']) / 100000000}** LTC\nTotal Sent: **{int(data['total_sent']) / 100000000}** LTC\n[View Transactions](https://litecoinspace.org/address/{address})")
+
+    await ctx.followup.send(embed=embed)
+
+@bot.tree.command(name="price")
+async def price(ctx: discord.Interaction, crypto: str, amount: float = 1.0):
+    await ctx.response.defer()
+
+    crypto = crypto.upper()
+    r = get(f"https://api.binance.com/api/v3/ticker/price?symbol={crypto}USDT")
+    data = r.json()
+
+    if 'price' in data:
+        embed = discord.Embed(
+            title=f"{crypto} to USD",
+            color=discord.Color.green()
+        )
+        embed.add_field(name="Price", value=f"**{amount}** {crypto} = **${amount * float(data['price']):.2f}** USD")
+        embed.set_footer(text="Info from Binance's API")
+    else:
+        embed = discord.Embed(
+            title=f"{crypto} Not Found :x:",
+            description="This error might occur if you didn't search using a ticker symbol, instead of the name!\nFor example, **BTC** instead of **Bitcoin**",
+            color=discord.Color.red()
+        )
+        embed.set_footer(text="Info from Binance's API")
+
+    await ctx.followup.send(embed=embed)
+
+@bot.tree.command(name="usd")
+async def price(ctx: discord.Interaction, crypto: str, amount: float):
+    await ctx.response.defer()
+
+    crypto = crypto.upper()
+    r = get(f"https://api.binance.com/api/v3/ticker/price?symbol={crypto}USDT")
+    data = r.json()
+
+    if 'price' in data:
+        embed = discord.Embed(
+            title=f"USD to {crypto}",
+            color=discord.Color.green()
+        )
+        embed.add_field(name="Price", value=f"**${amount:.2f}** USD = **{amount / float(data['price'])}** {crypto}")
+        embed.set_footer(text="Info from Binance's API")
+    else:
+        embed = discord.Embed(
+            title=f"{crypto} Not Found :x:",
+            description="This error might occur if you didn't search using a ticker symbol, instead of the name!\nFor example, **BTC** instead of **Bitcoin**",
+            color=discord.Color.red()
+        )
+        embed.set_footer(text="Info from Binance's API")
 
     await ctx.followup.send(embed=embed)
 
