@@ -10,5 +10,5 @@ A simple Discord bot made in Python to search Bitcoin, Ethereum and Litecoin add
 
 # To be added
 
-- Price checking command
+- Price conversion between different cryptocurrencies
 - Solana search
